@@ -1,0 +1,14 @@
+*.zip
+mydataset
+__pycache__
+result.md
+train_output
+run1.sh
+run2.sh
+run3.sh
+checkpoint
+record
+.ipynb_checkpoints
+visualize
+visual.sh
+baseline
