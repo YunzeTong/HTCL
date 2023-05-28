@@ -24,6 +24,10 @@ CUDA: 12.0
 NumPy: 1.21.6
 ```
 
+### Datasets
+
+See [here](./domainbed/scripts/download.py) for downloading datasets. In our paper, we use `PACS`, `OfficeHome`, `VLCS`, `TerraIncognita`.
+
 ## How to Run
 To run the algorithm proposed in the paper completely, you should pretrain the feature extractor and classifier in advance for the first stage (heterogeneous dividing pattern generation). Take `PACS` as an example, you can run the following command:
 
