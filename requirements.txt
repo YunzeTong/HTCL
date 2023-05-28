@@ -1,0 +1,8 @@
+beautifulsoup4==4.11.1
+gdown==4.6.0
+numpy==1.21.6
+prettytable==3.5.0
+sconf==0.2.5
+torch==1.10.0+cu111
+torchvision==0.11.0+cu111
+

@@ -100,7 +100,7 @@ class HeterogeneousDomains:
         self.input_shape = input_shape
         self.environments = []
         for i in range(self.domain_nmb):
-            if i == self.domain_nmb - 1:  # 把test默认放到最后面
+            if i == self.domain_nmb - 1:
                 self.environments.append("test_domain")
             else:
                 self.environments.append(f"domain_train_{i}")
@@ -111,17 +111,17 @@ def make_final_dataset(args, E_dataset, domain_labels, test_env, hparams=None):
                                             # 0 to args.num_clusters - 1 are all train domains
     # if number of envs decreases
     own_cluster_idx = torch.unique(domain_labels)
-    if own_cluster_idx.shape[0] != args.num_clusters: # TODO:这句有点小问题，把drop的index换成新的更大的不会改变shape[0]
-        args.test_env = args.num_clusters - 1 # TODO: 不在这句，在本函数最后改
+    if own_cluster_idx.shape[0] != args.num_clusters:
+        args.test_env = args.num_clusters - 1
     
     domains = []
-    E_dataset.perform_tensor_transform = True
+    E_dataset.in_heterogeneity_exploration = False
     # last num_clusters are all train domains, final is target domain
     for env_i in range(args.num_clusters):
         select_indices = torch.nonzero(domain_labels == env_i).ravel()
-        if select_indices.shape[0] == 0: # 某一env无样本，直接跳过
+        if select_indices.shape[0] == 0: # if a domain doesn't contain samples, just drop
             continue
-        single_domain = HeterogeneousDomain(copy.deepcopy(E_dataset), select_indices, int(hparams["batch_size"] / (1-args.holdout_fraction)))
+        single_domain = HeterogeneousDomain(E_dataset, select_indices, int(hparams["batch_size"] / (1-args.holdout_fraction)))
         # for i in range(select_indices.shape[0]):
         #     index = select_indices[i] # index_th img should be in env_i
         #     single_domain.add_item(imgs[index], labels[index])

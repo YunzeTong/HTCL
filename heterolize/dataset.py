@@ -5,7 +5,6 @@ import torch
 import torch.utils.data as data
 from domainbed.datasets import transforms as DBT
 from PIL.Image import Image
-from heterolize.baseline.utils.IPIRM_utils import train_transform
 
 if torch.cuda.is_available():
     device = "cuda"
@@ -23,7 +22,7 @@ class EnvChangeDataset(data.Dataset):
         self.labels = [] 
         self.original_env = []
         self.transform = DBT.basic
-        self.perform_tensor_transform = True
+        self.in_heterogeneity_exploration = True
 
         self.old_envs = [] # every term is the old training domain from given dataset
         self.old_envs_num = []
@@ -34,7 +33,7 @@ class EnvChangeDataset(data.Dataset):
         
     def __getitem__(self, index):
         old_env_idx, idx_in_old_env = self.find_old_env_index(index)   
-        if self.perform_tensor_transform:
+        if self.in_heterogeneity_exploration:
             # return self.transform(self.imgs[index]).to(device), self.labels[index].to(device), index
             return self.transform(self.old_envs[old_env_idx][idx_in_old_env][0]).to(device), \
                 self.labels[index].to(device), index
@@ -64,7 +63,7 @@ class EnvChangeDataset(data.Dataset):
     def find_old_env_index(self, index):
         """
         return old_env_idx, idx_in_old_env"""
-        original_pos = self.old2new_index_list.index(index) # 在顺序排列的old env中所处位置
+        original_pos = self.old2new_index_list.index(index) # the postion in the sequential old_env
         old_env_idx = len(self.old_envs)
         idx_in_old_env = -1
         for env_idx, old_env_num in enumerate(self.old_envs_num):
@@ -83,7 +82,6 @@ class EnvChangeDataset(data.Dataset):
             self.domain_labels = torch.tensor(self.domain_labels)
             # if self.num_envs < torch.unique(self.domain_labels).shape[0]:# TODO: under check
                 # print(f"{self.num_envs} < {torch.unique(self.domain_labels)}")
-            self.domain_labels = torch.randint(0, self.num_envs, self.domain_labels.shape) # randomly set domain labels for initialization
         else:
             self.domain_labels = new_domain_labels
 

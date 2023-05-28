@@ -8,7 +8,7 @@ import numpy as np
 from domainbed.datasets import datasets
 from heterolize.dataset import EnvChangeDataset as EDataset
 from heterolize.feature_heterolizer import FeatureHeterolizer
-from heterolize.env_splitter import EnvSplitter
+from heterolize.pattern_generator import PatternGenerator
 from heterolize.utils import make_final_dataset
 import os
 
@@ -60,7 +60,7 @@ def make_heterogenous_dataset(args, logger=None, hparams=None):
     logger.info("Total Loading Time: {:.3f} s".format(time.time() - pretrain_start_time))
 
     # prepare pattern generation module
-    env_splitter = EnvSplitter(args, dataset.labels, dataset.num_labels, args.num_clusters, \
+    pattern_generator = PatternGenerator(args, dataset.labels, dataset.num_labels, args.num_clusters, \
                             feature_heterolizer.featurizer.n_outputs, logger=logger)
     
     best_domain_labels = None
@@ -70,22 +70,22 @@ def make_heterogenous_dataset(args, logger=None, hparams=None):
     for epoch_i in range(args.main_epoch):
         logger.info(f"[Main Bone] Start Heterogeneous Dividing Pattern Generation for Epoch {epoch_i}")
         # heterolize feature with stable splitted env
-        features, distance = feature_heterolizer.explore_heterogeneity(dataset.domain_label, args.lambda_1)
+        features, distance = feature_heterolizer.explore_heterogeneity(dataset.domain_labels, args.lambda_1)
         
         if best_domain_labels == None:
-            best_domain_labels = dataset.domain_label.clone()
+            best_domain_labels = dataset.domain_labels.clone()
             best_distance = distance
         else:
             if distance > best_distance:
-                logger.info(f"[Main bone] Update domain labels, old dist:{best_distance}, new dist:{distance}")
-                best_domain_labels = dataset.domain_label.clone()
+                logger.info(f"[Main Bone] Update domain labels, old dist:{best_distance}, new dist:{distance}")
+                best_domain_labels = dataset.domain_labels.clone()
                 best_distance = distance
         if epoch_i != args.main_epoch - 1:
             # split environment with given feature
             if args.use_KMeans_method:
-                new_domain_labels = env_splitter.KMeans_split(features)
+                new_domain_labels = pattern_generator.KMeans_split(features)
             else:
-                new_domain_labels = env_splitter.generate_group(features)
+                new_domain_labels = pattern_generator.generate_group(features)
             dataset.update_domain_labels(new_domain_labels)
 
             logger.info(f"[Main Bone] Finish Epoch {epoch_i}; Domain splitted into {[torch.nonzero(new_domain_labels==i).ravel().shape[0] for i in range(args.num_clusters)]}")
@@ -104,7 +104,7 @@ def make_heterogenous_dataset(args, logger=None, hparams=None):
             best_domain_labels[temp] = args.num_clusters + 1
     
     if args.use_KMeans_method:
-        return make_final_dataset(args, dataset, dataset.domain_label, target_env, hparams)
+        return make_final_dataset(args, dataset, dataset.domain_labels, target_env, hparams)
     else:
         return make_final_dataset(args, dataset, best_domain_labels, target_env, hparams)
 
@@ -126,7 +126,7 @@ def pretrain(args, logger):
     feature_heterolizer = FeatureHeterolizer(args, dataset, args.num_clusters, logger)
     pretrain_start_time = time.time()
     
-    dir = f'/data/home/tongyunze/DG_model/heterogeneity/{args.dataset}/te_{args.test_env_name}'
+    dir = f'/data/home/tongyunze/DG_model/heterogeneity/check/{args.dataset}/te_{args.test_env_name}'
     feature_heterolizer.pretrain(args, dataset, dir)
     logger.info("Total Pretrain Time: {:.3f} s".format(time.time() - pretrain_start_time))
     

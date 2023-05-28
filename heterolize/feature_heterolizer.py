@@ -119,14 +119,14 @@ class FeatureHeterolizer:
             # assert total_indice.shape[0] != 0, f"STOP: One cluster has no samples, {torch.unique(env_indicator)}"
             total_indices.append(total_indice)
 
-        self.logger.info(f"[Heterogeneity Exploration] Number of Domains: {len(total_indices)}; Each domain's contained number: {[total_indice.shape[0] for total_indice in total_indices]}")
+        self.logger.info(f" [Heterogeneity Exploration] Number of Domains: {len(total_indices)}; Each domain's contained number: {[total_indice.shape[0] for total_indice in total_indices]}")
 
         # set dataloader
         dataloader = DataLoader(self.H_dataset, batch_size=64, shuffle=True)
         
         # train featurizer only to enhance extracting
         self.featurizer.train()
-        self.logger.info("Start to explore heterogeneity...")
+        self.logger.info(" [Heterogeneity Exploration] Start to explore heterogeneity...")
         for epoch_i in range(self.hf_epoch):
             total_CL_loss = 0
             total_classify_loss = 0
@@ -251,7 +251,7 @@ class FeatureHeterolizer:
                 labels_own_in_batch = torch.unique(labels)
                 for label_idx in range(labels_own_in_batch.shape[0]):
                     label = labels_own_in_batch[label_idx]
-                    same_label_indices = torch.nonzero(labels == label).ravel() # 本loader中label为`label`的index
+                    same_label_indices = torch.nonzero(labels == label).ravel()
                     specific_f_list = self.split_by_env(same_label_indices, feature, part_env_indicator)
                     # print(f"[TEST DEBUG] label:{label}, {len(specific_f_list)}")
                     if len(specific_f_list) > 1:

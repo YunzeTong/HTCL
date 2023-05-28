@@ -137,7 +137,7 @@ def main():
     torch.manual_seed(args.seed)
     torch.backends.cudnn.deterministic = args.deterministic
     torch.backends.cudnn.benchmark = not args.deterministic
-    torch.set_num_threads(10)
+    torch.set_num_threads(3)
 
 
     # Dummy datasets for logging information.
@@ -178,8 +178,6 @@ def main():
         logger.info("Pretrain feature extractor and classifier for heterogeneous dividing pattern generation")
         for test_env in args.test_envs:
             args.test_env = test_env[0]
-            if args.test_env != 3:
-                continue
             pretrain(args, logger)
         logger.info("Pretrain finished")
         return
