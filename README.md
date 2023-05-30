@@ -1,6 +1,6 @@
 # Quantitatively Measuring and Contrastively Exploring Heterogeneity for Domain Generalization
 
-Official PyTorch implementation of [Quantitatively Measuring and Contrastively Exploring Heterogeneity for Domain Generalization](https://arxiv.org/abs/2305.15889).
+Official PyTorch implementation of Quantitatively Measuring and Contrastively Exploring Heterogeneity for Domain Generalization.
 
 
 Note that this project is built upon [DomainBed@3fe9d7](https://github.com/facebookresearch/DomainBed/tree/3fe9d7bb4bc14777a42b3a9be8dd887e709ec414) and [SWAD](https://github.com/khanrc/swad).
